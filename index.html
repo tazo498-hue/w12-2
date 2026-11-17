@@ -1,0 +1,1542 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Little Workshop Adventure | Interactive Reading v2</title>
+
+<style>
+:root{
+  --green:#286b59;
+  --green2:#e7f3ec;
+  --cream:#fffaf1;
+  --ink:#263a34;
+  --muted:#6b7974;
+  --border:#dce6df;
+  --orange:#c16b30;
+  --paper:#ffffff;
+  --blue:#e8f2fb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#edf2ed;
+  color:var(--ink);
+  font-family:Arial,"Noto Sans KR",sans-serif;
+  line-height:1.6;
+}
+button,input,textarea,select{font:inherit}
+button{
+  cursor:pointer;
+  border:0;
+  border-radius:11px;
+  padding:11px 16px;
+  font-weight:700;
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible{
+  outline:3px solid #f4bd6b;
+  outline-offset:2px;
+}
+.app{
+  max-width:900px;
+  margin:auto;
+  padding:18px;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.logo{font-size:16px;font-weight:800;color:var(--green)}
+.timer{font-weight:bold;font-variant-numeric:tabular-nums}
+.progress{
+  height:8px;
+  border-radius:20px;
+  background:#d8e2da;
+  margin:15px 0;
+  overflow:hidden;
+}
+#progressFill{
+  height:100%;
+  width:0%;
+  background:var(--green);
+  transition:width .3s;
+}
+.book{
+  background:var(--paper);
+  padding:25px;
+  border-radius:22px;
+  box-shadow:0 8px 30px #304d3814;
+  min-height:590px;
+}
+.hidden{display:none!important}
+.center{text-align:center}
+.eyebrow{
+  color:var(--green);
+  text-transform:uppercase;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:1.5px;
+}
+h1{
+  font-size:clamp(27px,5vw,40px);
+  line-height:1.25;
+}
+h2{
+  font-size:clamp(21px,4vw,27px);
+  line-height:1.35;
+}
+h3{font-size:18px}
+.subtitle{color:var(--muted)}
+.small{color:var(--muted);font-size:13px}
+.panel{
+  background:#f6f9f5;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
+  margin-top:18px;
+}
+.btn-primary{background:var(--green);color:white}
+.btn-soft{background:var(--green2);color:var(--green)}
+.btn-light{background:#f1f3ef;color:var(--ink)}
+.btn-orange{background:#fff0dd;color:#96551e}
+.controls{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:18px;
+}
+.levels{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:15px 0;
+}
+.levels button{
+  background:#f1f3ee;
+  min-width:62px;
+}
+.levels button.active{
+  background:var(--green);
+  color:white;
+}
+.art{
+  background:linear-gradient(135deg,#e1efe3,#fff0d7);
+  border-radius:17px;
+  overflow:hidden;
+  margin:17px 0;
+  height:265px;
+}
+.art svg{width:100%;height:100%;display:block}
+.story{
+  text-align:center;
+  font-size:clamp(19px,3.5vw,25px);
+  line-height:1.8;
+  max-width:710px;
+  margin:22px auto;
+}
+.target{
+  color:var(--orange);
+  text-decoration:underline dotted;
+  text-underline-offset:5px;
+  font-weight:800;
+  cursor:pointer;
+  border:0;
+  padding:0 1px;
+  background:transparent;
+  font-size:inherit;
+}
+.page-status{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  color:var(--muted);
+  font-size:13px;
+}
+.partner{
+  margin-top:20px;
+  border:1px solid #cce1d3;
+  background:#f1f8f2;
+  border-radius:16px;
+  padding:18px;
+}
+.partner-label{
+  font-size:13px;
+  font-weight:800;
+  color:var(--green);
+}
+.question{
+  font-size:19px;
+  font-weight:700;
+  margin:12px 0;
+}
+textarea{
+  width:100%;
+  min-height:85px;
+  border:1px solid #cbd7cf;
+  border-radius:12px;
+  padding:12px;
+  resize:vertical;
+  background:white;
+  color:var(--ink);
+}
+.feedback{
+  margin-top:13px;
+  padding:13px;
+  background:white;
+  border-left:4px solid var(--green);
+  border-radius:9px;
+  font-size:15px;
+}
+.feedback:empty{display:none}
+.tip{
+  padding:12px;
+  background:#fff5e7;
+  border-radius:10px;
+  margin-top:12px;
+  font-size:14px;
+}
+.word-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.word-card{
+  min-height:73px;
+  background:#f1f5ef;
+  padding:10px;
+  text-align:center;
+}
+.word-card .ko{
+  font-size:12px;
+  color:var(--green);
+  margin-top:6px;
+  display:block;
+}
+.quiz-options{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:20px;
+}
+.quiz-option{
+  background:#f1f4ef;
+  text-align:left;
+  border:2px solid transparent;
+}
+.correct{background:#def2e4!important;border-color:#42935a!important}
+.incorrect{background:#ffe6e0!important;border-color:#d97c65!important}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:20px;
+}
+.stat{
+  border-radius:13px;
+  background:var(--green2);
+  padding:15px 9px;
+  text-align:center;
+}
+.stat strong{
+  display:block;
+  font-size:25px;
+  color:var(--green);
+}
+.stat span{font-size:12px}
+select{
+  padding:8px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:white;
+}
+footer{
+  font-size:12px;
+  text-align:center;
+  color:var(--muted);
+  padding:16px 0;
+}
+@media(max-width:550px){
+  .app{padding:8px}
+  .book{padding:16px}
+  .art{height:220px}
+  .word-grid{grid-template-columns:repeat(2,1fr)}
+  .quiz-options{grid-template-columns:1fr}
+  .controls button{flex:1}
+  .stat-grid{gap:5px}
+  .stat{padding:12px 5px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">📖 English Storybook Lab · v2</div>
+  <div id="timer" class="timer">⏱ 05:00</div>
+</header>
+<div class="progress"><div id="progressFill"></div></div>
+
+<main class="book">
+
+<!-- WELCOME -->
+<section id="welcome">
+  <div class="center">
+    <div class="eyebrow">Interactive Shared Reading</div>
+    <h1>The Little Workshop Adventure</h1>
+    <p class="subtitle">
+      Read, think, speak, and discover 15 action verbs.
+    </p>
+  </div>
+
+  <div class="art" id="coverArt"></div>
+
+  <div class="panel center">
+    <h3>Choose Your English Level</h3>
+    <p class="small">
+      Questions will change based on your level.
+    </p>
+    <div class="levels" id="welcomeLevels"></div>
+    <p id="levelDescription" class="small"></p>
+  </div>
+
+  <div class="controls">
+    <button class="btn-primary" onclick="startStory()">
+      Start My Adventure →
+    </button>
+  </div>
+</section>
+
+<!-- READER -->
+<section id="reader" class="hidden">
+  <div class="page-status">
+    <span id="pageLabel"></span>
+    <span id="currentLevel"></span>
+  </div>
+
+  <h2 id="pageTitle"></h2>
+
+  <div id="pageArt" class="art"></div>
+
+  <div class="story" id="storyText"></div>
+
+  <div class="controls">
+    <button class="btn-soft" onclick="readPage()">
+      🔊 Listen
+    </button>
+    <button class="btn-light" onclick="showAllMeanings()">
+      🇰🇷 Korean Hint
+    </button>
+    <label class="small">
+      Speed
+      <select id="speechRate">
+        <option value="0.7">Slow</option>
+        <option value="0.85" selected>Normal</option>
+        <option value="1">Fast</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="wordHint" class="tip hidden" aria-live="polite"></div>
+
+  <div class="partner">
+    <div class="partner-label">💬 AI Reading Partner</div>
+    <p id="readingQuestion" class="question"></p>
+
+    <textarea
+      id="readingAnswer"
+      placeholder="Write your answer in English..."
+      aria-label="Your answer"
+    ></textarea>
+
+    <div class="controls">
+      <button class="btn-soft" onclick="startVoice('readingAnswer')">
+        🎤 Speak
+      </button>
+      <button class="btn-primary" onclick="checkReadingAnswer()">
+        Check My Answer
+      </button>
+      <button class="btn-light" onclick="showQuestionHint()">
+        💡 Help
+      </button>
+    </div>
+
+    <div id="readingFeedback" class="feedback" aria-live="polite"></div>
+    <div id="questionHint" class="tip hidden"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-light" id="previousButton" onclick="previousPage()">
+      ← Previous
+    </button>
+    <button class="btn-primary" id="nextButton" onclick="nextPage()">
+      Next Page →
+    </button>
+  </div>
+</section>
+
+<!-- RETELLING -->
+<section id="retelling" class="hidden">
+  <div class="eyebrow">After Reading</div>
+  <h2>🎙 Retell the Story!</h2>
+
+  <p>
+    Mia and Leo finished their festival booth.
+    Can you explain what happened?
+  </p>
+
+  <div class="panel">
+    <strong>Your Mission</strong>
+    <p>
+      Retell the story using at least
+      <strong>three action verbs</strong>.
+    </p>
+    <p class="small">
+      Example: First, they hoisted a banner.
+    </p>
+  </div>
+
+  <h3>Useful Action Verbs</h3>
+  <div id="retellingWords" class="word-grid"></div>
+
+  <div class="panel">
+    <textarea
+      id="retellingAnswer"
+      style="min-height:120px"
+      placeholder="First, Mia and Leo..."
+      aria-label="Retell the story"
+    ></textarea>
+
+    <div class="controls">
+      <button class="btn-soft" onclick="startVoice('retellingAnswer')">
+        🎤 Speak
+      </button>
+      <button class="btn-primary" onclick="checkRetelling()">
+        Check My Story
+      </button>
+      <button class="btn-light" onclick="showRetellingHelp()">
+        💡 Sentence Help
+      </button>
+    </div>
+
+    <div id="retellingHelp" class="tip hidden">
+      First, Mia and Leo ______.
+      Next, they ______.
+      Finally, they ______.
+    </div>
+
+    <div id="retellingFeedback" class="feedback" aria-live="polite"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-light" onclick="returnToBook()">
+      ← Back to Story
+    </button>
+    <button class="btn-primary" onclick="startQuiz()">
+      Vocabulary Check →
+    </button>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="hidden">
+  <div id="quizNumber" class="eyebrow"></div>
+  <h2 id="quizQuestion"></h2>
+  <div class="quiz-options" id="quizOptions"></div>
+  <div id="quizFeedback" class="feedback" aria-live="polite"></div>
+  <div class="controls">
+    <button
+      class="btn-primary hidden"
+      id="quizNext"
+      onclick="nextQuiz()"
+    >
+      Next →
+    </button>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="hidden center">
+  <div class="eyebrow">Adventure Complete</div>
+  <h1>🎉 Story Completed!</h1>
+  <p>You finished your interactive reading adventure.</p>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <strong id="readingStat">0</strong>
+      <span>Reading Responses</span>
+    </div>
+    <div class="stat">
+      <strong id="retellingStat">0</strong>
+      <span>Verbs in Retelling</span>
+    </div>
+    <div class="stat">
+      <strong id="quizStat">0/3</strong>
+      <span>Quiz Score</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Vocabulary Review</h3>
+    <div class="word-grid" id="finalWordGrid"></div>
+  </div>
+
+  <p class="small">
+    Try using these verbs in your own sentences!
+  </p>
+
+  <div class="controls">
+    <button class="btn-primary" onclick="restart()">
+      ↻ Read Again
+    </button>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Interactive reading prototype ·
+  Rule-based feedback ·
+  Speech features depend on browser support
+</footer>
+
+</div>
+
+<script>
+"use strict";
+
+/* ==========================================
+   VOCABULARY
+========================================== */
+
+const vocabulary = [
+  {word:"hoist",ko:"끌어올리다"},
+  {word:"sift",ko:"체로 거르다"},
+  {word:"whittle",ko:"나무를 조금씩 깎다"},
+  {word:"braid",ko:"땋다"},
+  {word:"stoop",ko:"몸을 굽히다"},
+  {word:"trample",ko:"짓밟다"},
+  {word:"clasp",ko:"꽉 잡다"},
+  {word:"prod",ko:"쿡 찌르다"},
+  {word:"tug",ko:"세게 잡아당기다"},
+  {word:"clench",ko:"꽉 쥐다"},
+  {word:"snip",ko:"싹둑 자르다"},
+  {word:"crumple",ko:"구기다"},
+  {word:"shred",ko:"잘게 찢다"},
+  {word:"dab",ko:"가볍게 톡톡 두드리다"},
+  {word:"slouch",ko:"구부정하게 앉거나 서다"}
+];
+
+const $ = id => document.getElementById(id);
+
+const levels = {
+  A1:"Identify actions using simple words.",
+  A2:"Describe actions in short sentences.",
+  B1:"Explain reasons using story context.",
+  B2:"Infer meanings and explain differences."
+};
+
+/* ==========================================
+   STORY AND LEVEL-BASED QUESTIONS
+========================================== */
+
+const story = [
+{
+ title:"A Big Surprise",
+ text:"Mia and Leo had a plan. They wanted to build a beautiful festival booth.",
+ image:"festival",
+ verbs:[],
+ questions:{
+  A1:["What do Mia and Leo want to build?",
+      ["booth","festival","stand"],
+      "Look at their festival booth."],
+  A2:["What are Mia and Leo planning to make?",
+      ["booth","festival","stand"],
+      "They want to make a festival booth."],
+  B1:["Why do you think they need to work together?",
+      ["help","together","work","build","difficult","big","share","team"],
+      "A festival booth takes teamwork."],
+  B2:["What challenges might they face while preparing the booth?",
+      ["heavy","time","work","material","build","decoration","difficult","problem","need"],
+      "They may need to lift, prepare, and decorate many things."]
+ }
+},
+{
+ title:"Getting Ready",
+ text:"First, they had to <b>hoist</b> a heavy banner. Then Mia used a sieve to <b>sift</b> flour for cookies.",
+ image:"hoist",
+ verbs:["hoist","sift"],
+ questions:{
+  A1:["Are they lifting or dropping the banner?",
+      ["lift","lifting","up","hoist"],
+      "They are lifting it up."],
+  A2:["What are they doing with the banner?",
+      ["lift","pull","raise","hoist","up"],
+      "They are hoisting the banner."],
+  B1:["Why might they need a rope to hoist the banner?",
+      ["heavy","high","lift","raise","up","large","big","easier","help"],
+      "A rope makes it easier to raise a heavy banner."],
+  B2:["How is hoisting different from simply carrying something?",
+      ["up","lift","raise","vertical","rope","higher","elevat"],
+      "Hoisting emphasizes raising something upward, often using a rope."]
+ }
+},
+{
+ title:"Making Decorations",
+ text:"Leo began to <b>whittle</b> a small wooden star. Mia decided to <b>braid</b> three colorful ribbons.",
+ image:"craft",
+ verbs:["whittle","braid"],
+ questions:{
+  A1:["Is Leo working with wood or paper?",
+      ["wood","wooden"],
+      "He is working with wood."],
+  A2:["What is Mia doing with the ribbons?",
+      ["braid","weav","intertwin","cross","plait"],
+      "She is braiding the ribbons."],
+  B1:["Why does Leo whittle the wood carefully?",
+      ["shape","star","careful","small","cut","carv","safe","detail"],
+      "He wants to carve a small wooden star."],
+  B2:["How are whittling and braiding different?",
+      ["wood","carv","cut","strand","ribbon","weav","intertwin"],
+      "Whittling removes small pieces of wood, while braiding interweaves strands."]
+ }
+},
+{
+ title:"A Little Trouble",
+ text:"Mia had to <b>stoop</b> to pick up a ribbon. Suddenly, Leo almost <b>trampled</b> the flowers!",
+ image:"flowers",
+ verbs:["stoop","trample"],
+ questions:{
+  A1:["Does Mia bend down or jump up?",
+      ["bend","down","stoop"],
+      "She bends down."],
+  A2:["Why does Mia stoop?",
+      ["pick","ribbon","ground","floor","get","reach"],
+      "She stoops to pick up a ribbon."],
+  B1:["Why should Leo be careful near the flowers?",
+      ["step","trample","crush","damage","hurt","flower","destroy"],
+      "He might trample the flowers."],
+  B2:["What makes trampling different from ordinary walking?",
+      ["force","heavy","crush","damage","step","stomp","press"],
+      "Trampling involves stepping heavily on something, often damaging it."]
+ }
+},
+{
+ title:"Working Together",
+ text:"Mia <b>clasped</b> Leo's hand. Leo used one finger to <b>prod</b> a loose decoration.",
+ image:"hands",
+ verbs:["clasp","prod"],
+ questions:{
+  A1:["Does Mia hold Leo's hand?",
+      ["yes","hold","hand","clasp"],
+      "Yes, she clasps his hand."],
+  A2:["What does Leo do to the decoration?",
+      ["prod","poke","push","touch","finger","press"],
+      "He prods it with one finger."],
+  B1:["Why might Leo prod the decoration?",
+      ["check","loose","fix","test","move","adjust","see","attach"],
+      "He may be checking whether it is loose."],
+  B2:["How is clasping different from prodding?",
+      ["hold","grip","tight","poke","press","finger","brief"],
+      "Clasping means holding firmly. Prodding means poking or pressing."]
+ }
+},
+{
+ title:"The Stuck Rope",
+ text:"They had to <b>tug</b> on a rope. Leo began to <b>clench</b> his fists because it was so difficult.",
+ image:"rope",
+ verbs:["tug","clench"],
+ questions:{
+  A1:["Are they pushing or pulling the rope?",
+      ["pull","tug"],
+      "They are pulling the rope."],
+  A2:["What does Leo do with his fists?",
+      ["clench","close","tight","squeez","fist"],
+      "He clenches his fists."],
+  B1:["Why might Leo clench his fists?",
+      ["difficult","frustrat","angry","stress","effort","hard","tense"],
+      "He may feel frustrated because the rope is difficult to pull."],
+  B2:["How are tugging and clenching different physical actions?",
+      ["pull","rope","grip","fist","tight","close","hand","force"],
+      "Tugging is a strong pulling motion; clenching is tightening a fist."]
+ }
+},
+{
+ title:"Paper Magic",
+ text:"Mia used scissors to <b>snip</b> some paper. Leo accidentally <b>crumpled</b> one sheet.",
+ image:"paper",
+ verbs:["snip","crumple"],
+ questions:{
+  A1:["Does Mia use scissors?",
+      ["yes","scissor","snip"],
+      "Yes, she uses scissors."],
+  A2:["What happened to Leo's paper?",
+      ["crumpl","wrinkl","crush","squeez","ball"],
+      "He crumpled it."],
+  B1:["How does snipping change paper?",
+      ["cut","small","piece","short","shape","edge","trim"],
+      "Snipping makes small cuts."],
+  B2:["How are snipping and crumpling different?",
+      ["cut","scissor","wrinkl","crush","fold","squeez","shape"],
+      "Snipping cuts the paper. Crumpling crushes it into wrinkles."]
+ }
+},
+{
+ title:"Finishing Touches",
+ text:"They decided to <b>shred</b> the old paper into tiny strips. Then Mia used a sponge to <b>dab</b> blue paint onto a sign.",
+ image:"paint",
+ verbs:["shred","dab"],
+ questions:{
+  A1:["Is Mia using blue paint?",
+      ["yes","blue","paint"],
+      "Yes, she uses blue paint."],
+  A2:["What do they do with the old paper?",
+      ["shred","tear","strip","piece","cut"],
+      "They shred it into tiny strips."],
+  B1:["Why might Mia dab the paint instead of brushing it?",
+      ["gentle","light","spot","texture","small","pattern","control","tap"],
+      "Dabbing makes small, controlled marks."],
+  B2:["How is dabbing different from rubbing paint across a surface?",
+      ["light","tap","touch","repeated","press","rub","stroke","small"],
+      "Dabbing uses light repeated touches instead of continuous rubbing."]
+ }
+},
+{
+ title:"A Happy Ending",
+ text:"Leo began to <b>slouch</b> because he was tired. But when the festival opened, everyone smiled!",
+ image:"finish",
+ verbs:["slouch"],
+ questions:{
+  A1:["Is Leo tired or excited?",
+      ["tired","exhaust","sleep"],
+      "He is tired."],
+  A2:["Why is Leo slouching?",
+      ["tired","exhaust","work","rest","fatigue"],
+      "He is tired after working hard."],
+  B1:["What does Leo's posture tell us?",
+      ["tired","exhaust","fatigue","energy","rest","work"],
+      "His slouched posture suggests he feels tired."],
+  B2:["How does the final scene contrast Leo's physical state and his feelings?",
+      ["tired","exhaust","happy","proud","satisf","smile","success"],
+      "He is physically tired, but the successful festival makes him happy."]
+ }
+}
+];
+
+/* ==========================================
+   APPLICATION STATE
+========================================== */
+
+let currentLevel="A2";
+let pageIndex=0;
+let readingResponses={};
+let questionAttempts={};
+let retellingCount=0;
+let quizIndex=0;
+let quizScore=0;
+let quizAnswered=false;
+let quizItems=[];
+let timerId=null;
+let timeLeft=300;
+let timeExpired=false;
+let recognition=null;
+let activeSpeechField=null;
+
+function escapeHTML(value){
+ return String(value).replace(/[&<>"']/g,c=>({
+   "&":"&amp;",
+   "<":"&lt;",
+   ">":"&gt;",
+   '"':"&quot;",
+   "'":"&#39;"
+ }[c]));
+}
+
+function showSection(id){
+ ["welcome","reader","retelling","quiz","results"]
+ .forEach(section=>{
+   $(section).classList.toggle("hidden",section!==id);
+ });
+ window.scrollTo({top:0,behavior:"instant"});
+}
+
+function updateProgress(percent){
+ $("progressFill").style.width=
+   Math.max(0,Math.min(100,percent))+"%";
+}
+
+function selectLevel(level){
+ if(!levels[level])return;
+ currentLevel=level;
+ renderLevelButtons();
+ $("levelDescription").textContent=levels[level];
+}
+
+function renderLevelButtons(){
+ $("welcomeLevels").innerHTML="";
+ Object.keys(levels).forEach(level=>{
+   const button=document.createElement("button");
+   button.textContent=level;
+   button.className=level===currentLevel?"active":"";
+   button.setAttribute("aria-pressed",String(level===currentLevel));
+   button.onclick=()=>selectLevel(level);
+   $("welcomeLevels").appendChild(button);
+ });
+}
+
+/* ==========================================
+   SVG STORY ILLUSTRATIONS
+   All drawings embedded, no internet needed.
+========================================== */
+
+function svgIllustration(type){
+ const person=(x,y,shirt,pose="stand")=>{
+   if(pose==="stoop"){
+     return `<g transform="translate(${x},${y})">
+       <circle cx="0" cy="-65" r="23" fill="#edbd98"/>
+       <path d="M-4 -40 L46 -5 L65 45" fill="none"
+         stroke="${shirt}" stroke-width="32"
+         stroke-linecap="round"/>
+       <path d="M43 -5 L82 28" stroke="#edbd98"
+         stroke-width="13" stroke-linecap="round"/>
+       <path d="M65 45 L105 88 M65 45 L25 88"
+         stroke="#435a57" stroke-width="17"
+         stroke-linecap="round"/>
+     </g>`;
+   }
+   if(pose==="slouch"){
+     return `<g transform="translate(${x},${y})">
+       <path d="M-8 -60 Q-36 -5 6 48"
+         fill="none" stroke="${shirt}"
+         stroke-width="34" stroke-linecap="round"/>
+       <circle cx="-18" cy="-68" r="23" fill="#edbd98"/>
+       <path d="M5 45 L-20 108 M5 45 L42 108"
+         fill="none" stroke="#435a57"
+         stroke-width="18" stroke-linecap="round"/>
+       <path d="M-28 -12 L-62 36"
+         stroke="#edbd98" stroke-width="14"
+         stroke-linecap="round"/>
+     </g>`;
+   }
+   return `<g transform="translate(${x},${y})">
+     <circle cx="0" cy="-73" r="24" fill="#edbd98"/>
+     <path d="M-8 -100 Q0 -115 18 -95"
+       stroke="#5b453b" stroke-width="13"
+       stroke-linecap="round"/>
+     <path d="M0 -48 V42" stroke="${shirt}"
+       stroke-width="38" stroke-linecap="round"/>
+     <path d="M-12 -24 L-48 20 M12 -24 L48 20"
+       stroke="#edbd98" stroke-width="14"
+       stroke-linecap="round"/>
+     <path d="M0 35 L-27 110 M0 35 L27 110"
+       stroke="#435a57" stroke-width="17"
+       stroke-linecap="round"/>
+   </g>`;
+ };
+
+ const artwork={
+ festival:`
+   <path d="M110 120 L300 40 L490 120Z" fill="#e6a078"/>
+   <rect x="125" y="120" width="350" height="180"
+     rx="8" fill="#fff9e8"/>
+   <text x="300" y="160" text-anchor="middle"
+     font-size="31" font-weight="bold"
+     fill="#4b8170">FESTIVAL</text>
+   ${person(230,215,"#7aafa0")}
+   ${person(370,215,"#d99c76")}`,
+ hoist:`
+   <path d="M120 95 H480" stroke="#627e72" stroke-width="8"/>
+   <path d="M160 95 V210 M440 95 V210"
+     stroke="#b58d58" stroke-width="6"
+     stroke-dasharray="8 5"/>
+   <rect x="165" y="110" width="270" height="80"
+     rx="7" fill="#fff8df" stroke="#76a18f" stroke-width="5"/>
+   <text x="300" y="160" text-anchor="middle"
+     font-size="28" fill="#477465">WELCOME</text>
+   <path d="M460 95 V260" stroke="#b58d58"
+     stroke-width="7"/>
+   ${person(495,220,"#d99c76")}
+   <path d="M473 240 L461 270" stroke="#edbd98" stroke-width="13"/>`,
+ craft:`
+   <rect x="90" y="210" width="420" height="30"
+     rx="8" fill="#b78b68"/>
+   <path d="M130 210 L180 100 L200 115 L160 210Z"
+     fill="#bc905c"/>
+   <polygon points="182,65 195,91 225,95 202,115 208,146 182,132 156,146 162,115 139,95 169,91"
+     fill="#f2c66e"/>
+   ${[330,365,400].map((x,i)=>`
+     <path d="M${x} 78 Q${x+(i%2?30:-30)} 130 ${x} 180 T${x} 255"
+       fill="none"
+       stroke="${["#dc7f88","#7aa2c7","#e4ba62"][i]}"
+       stroke-width="13"/>`).join("")}`,
+ flowers:`
+   ${[140,250,360,470].map((x,i)=>`
+     <path d="M${x} 295 V210" stroke="#66936c"
+       stroke-width="7"/>
+     <circle cx="${x}" cy="200" r="27"
+       fill="${["#e7a0aa","#f1c76c","#b6a2df","#e6a0ac"][i]}"/>
+     <circle cx="${x}" cy="200" r="10" fill="#fff3bd"/>
+   `).join("")}
+   ${person(240,140,"#75ae9a","stoop")}
+   <path d="M420 110 L475 158 L455 180"
+     fill="none" stroke="#4c6766"
+     stroke-width="20" stroke-linecap="round"/>`,
+ hands:`
+   <path d="M70 220 Q170 130 260 205"
+     fill="none" stroke="#75a99a"
+     stroke-width="60" stroke-linecap="round"/>
+   <path d="M530 220 Q420 130 330 205"
+     fill="none" stroke="#dfac80"
+     stroke-width="60" stroke-linecap="round"/>
+   <path d="M255 205 Q300 160 345 205"
+     fill="none" stroke="#edbd98"
+     stroke-width="33" stroke-linecap="round"/>
+   <circle cx="300" cy="170" r="18" fill="#edbd98"/>
+   <rect x="275" y="65" width="55" height="48"
+     rx="8" fill="#f1bc70"/>`,
+ rope:`
+   <path d="M60 170 Q300 145 540 170"
+     fill="none" stroke="#b58b57"
+     stroke-width="16" stroke-linecap="round"/>
+   <path d="M100 100 L180 165 L100 225"
+     fill="none" stroke="#edbd98"
+     stroke-width="28" stroke-linecap="round"/>
+   <path d="M500 100 L420 165 L500 225"
+     fill="none" stroke="#edbd98"
+     stroke-width="28" stroke-linecap="round"/>
+   <path d="M270 110 L315 80 M310 110 L350 80"
+     stroke="#d8a66d" stroke-width="12"
+     stroke-linecap="round"/>`,
+ paper:`
+   <rect x="110" y="75" width="145" height="195"
+     rx="8" fill="#fffdf5" stroke="#bccbc0" stroke-width="4"/>
+   <path d="M148 120 H222 M148 155 H222 M148 190 H208"
+     stroke="#c8d8d0" stroke-width="8"/>
+   <path d="M330 120 L420 85 L475 155 L440 255 L355 225Z"
+     fill="#f6ebcd" stroke="#c9ba98" stroke-width="5"/>
+   <path d="M330 120 L408 165 L355 225 M420 85 L408 165 L475 155 M408 165 L440 255"
+     fill="none" stroke="#c9ba98" stroke-width="4"/>
+   <path d="M245 65 L290 132 M320 65 L285 132"
+     stroke="#718eaa" stroke-width="9" stroke-linecap="round"/>
+   <circle cx="290" cy="138" r="10" fill="#718eaa"/>`,
+ paint:`
+   <rect x="125" y="65" width="350" height="215"
+     rx="12" fill="#fffaf0"/>
+   <path d="M170 165 Q230 100 300 165 T430 155"
+     fill="none" stroke="#7eadd5" stroke-width="23"/>
+   <rect x="390" y="65" width="56" height="70"
+     rx="9" fill="#dfb971"
+     transform="rotate(22 420 90)"/>
+   <path d="M428 128 L450 190"
+     stroke="#917659" stroke-width="13"/>
+   ${[185,215,245].map((x,i)=>`
+     <rect x="${x}" y="${225+i*4}" width="7" height="38"
+       fill="${i%2?"#d6a3a5":"#a6c4df"}"
+       transform="rotate(${i*9} ${x} 230)"/>`).join("")}`,
+ finish:`
+   <path d="M130 115 L300 45 L470 115Z" fill="#e6a078"/>
+   <rect x="145" y="115" width="310" height="175"
+     rx="8" fill="#fff8e5"/>
+   <text x="300" y="155" text-anchor="middle"
+     font-size="29" font-weight="bold"
+     fill="#4d8270">WE DID IT!</text>
+   ${person(230,195,"#7aafa0")}
+   ${person(375,170,"#dba27c","slouch")}
+   ${[150,220,390,455].map((x,i)=>`
+     <circle cx="${x}" cy="${45+(i%2)*30}"
+       r="12"
+       fill="${["#e9a0a3","#edc76c","#85b6cb","#b8a5db"][i]}"/>`).join("")}`
+ };
+
+ return `<svg xmlns="http://www.w3.org/2000/svg"
+   viewBox="0 0 600 320"
+   role="img" aria-label="Illustration of the story scene">
+   <defs>
+     <linearGradient id="sceneBackground" x2="1" y2="1">
+       <stop stop-color="#e1f0e4"/>
+       <stop offset="1" stop-color="#fff1d8"/>
+     </linearGradient>
+   </defs>
+   <rect width="600" height="320" fill="url(#sceneBackground)"/>
+   <circle cx="515" cy="55" r="55"
+     fill="#ffffff" opacity=".35"/>
+   <path d="M0 300 Q300 280 600 300 V320 H0Z"
+     fill="#a7caa8" opacity=".45"/>
+   ${artwork[type]||artwork.festival}
+ </svg>`;
+}
+
+/* ==========================================
+   SPEECH
+========================================== */
+
+function stopSpeech(){
+ if("speechSynthesis" in window){
+   speechSynthesis.cancel();
+ }
+}
+
+function speak(text){
+ if(!("speechSynthesis" in window)){
+   alert("Speech playback is not supported in this browser.");
+   return;
+ }
+ stopSpeech();
+ const speech=new SpeechSynthesisUtterance(text);
+ speech.lang="en-US";
+ speech.rate=Number($("speechRate").value);
+ speech.pitch=1;
+ speechSynthesis.speak(speech);
+}
+
+function readPage(){
+ const text=story[pageIndex].text.replace(/<[^>]*>/g,"");
+ speak(text);
+}
+
+function startVoice(fieldId){
+ const Recognition=
+   window.SpeechRecognition||window.webkitSpeechRecognition;
+
+ if(!Recognition){
+   alert(
+     "Voice recognition is unavailable in this browser. "+
+     "Please type your answer or try Chrome or Edge."
+   );
+   return;
+ }
+
+ if(recognition){
+   try{recognition.abort();}catch(e){}
+   recognition=null;
+ }
+
+ const target=$(fieldId);
+ const instance=new Recognition();
+ recognition=instance;
+ activeSpeechField=fieldId;
+
+ instance.lang="en-US";
+ instance.continuous=false;
+ instance.interimResults=false;
+ instance.maxAlternatives=1;
+
+ instance.onresult=event=>{
+   const transcript=event.results[0][0].transcript;
+   target.value=(target.value+" "+transcript).trim();
+   target.focus();
+ };
+
+ instance.onerror=event=>{
+   if(event.error!=="aborted"){
+     alert("Microphone error: "+event.error);
+   }
+ };
+
+ instance.onend=()=>{
+   if(recognition===instance){
+     recognition=null;
+     activeSpeechField=null;
+   }
+ };
+
+ try{
+   instance.start();
+ }catch(error){
+   alert("Microphone could not start. Please type instead.");
+ }
+}
+
+/* ==========================================
+   TIMER
+========================================== */
+
+function startTimer(){
+ if(timerId)clearInterval(timerId);
+ timeLeft=300;
+ timeExpired=false;
+ updateTimer();
+
+ timerId=setInterval(()=>{
+   if(timeLeft>0){
+     timeLeft--;
+     updateTimer();
+   }else{
+     clearInterval(timerId);
+     timerId=null;
+     timeExpired=true;
+     $("timer").textContent="⏱ Time's up";
+   }
+ },1000);
+}
+
+function updateTimer(){
+ const minutes=String(Math.floor(timeLeft/60)).padStart(2,"0");
+ const seconds=String(timeLeft%60).padStart(2,"0");
+ $("timer").textContent=`⏱ ${minutes}:${seconds}`;
+}
+
+/* ==========================================
+   READING
+========================================== */
+
+function startStory(){
+ pageIndex=0;
+ readingResponses={};
+ questionAttempts={};
+ retellingCount=0;
+ quizScore=0;
+ startTimer();
+ renderPage();
+ showSection("reader");
+}
+
+function renderPage(){
+ stopSpeech();
+ const page=story[pageIndex];
+
+ $("pageLabel").textContent=
+   `PAGE ${pageIndex+1} / ${story.length}`;
+ $("currentLevel").textContent=`Level: ${currentLevel}`;
+ $("pageTitle").textContent=page.title;
+ $("pageArt").innerHTML=svgIllustration(page.image);
+
+ $("storyText").innerHTML=page.text.replace(
+   /<b>(.*?)<\/b>/g,
+   (match,word)=>
+     `<button class="target"
+       data-word="${word}"
+       title="Click for meaning">${word}</button>`
+ );
+
+ $("storyText").querySelectorAll(".target").forEach(button=>{
+   button.onclick=()=>showWordMeaning(button.dataset.word);
+ });
+
+ $("readingQuestion").textContent=
+   page.questions[currentLevel][0];
+
+ $("readingAnswer").value=readingResponses[pageIndex]||"";
+ $("readingFeedback").textContent="";
+ $("questionHint").classList.add("hidden");
+ $("wordHint").classList.add("hidden");
+
+ $("previousButton").disabled=pageIndex===0;
+ $("nextButton").textContent=
+   pageIndex===story.length-1
+   ?"Retell the Story →"
+   :"Next Page →";
+
+ updateProgress(5+(pageIndex/story.length)*65);
+}
+
+function showWordMeaning(word){
+ const item=vocabulary.find(v=>v.word===word.toLowerCase());
+ if(!item)return;
+ $("wordHint").textContent=`${item.word}: ${item.ko}`;
+ $("wordHint").classList.remove("hidden");
+}
+
+function showAllMeanings(){
+ const page=story[pageIndex];
+ const output=page.verbs.map(word=>{
+   const item=vocabulary.find(v=>v.word===word);
+   return item?`${word} = ${item.ko}`:"";
+ }).filter(Boolean);
+
+ $("wordHint").textContent=output.length
+   ?output.join("  |  ")
+   :"Look at the picture. What do you think is happening?";
+
+ $("wordHint").classList.remove("hidden");
+}
+
+function showQuestionHint(){
+ const hint=story[pageIndex].questions[currentLevel][2];
+ $("questionHint").textContent=hint;
+ $("questionHint").classList.remove("hidden");
+}
+
+function normalize(text){
+ return text.toLowerCase()
+   .replace(/[^\p{L}\p{N}\s]/gu," ")
+   .replace(/\s+/g," ")
+   .trim();
+}
+
+function hasKeyword(answer,keywords){
+ const text=normalize(answer);
+ return keywords.some(keyword=>{
+   const safe=keyword.toLowerCase();
+   if(safe.endsWith("at")||safe.endsWith("av")){
+     return text.includes(safe);
+   }
+   if(["carv","weav","intertwin","squeez","wrinkl",
+       "crumpl","exhaust","frustrat","satisf","elevat"]
+       .includes(safe)){
+     return text.split(" ").some(w=>w.startsWith(safe));
+   }
+   return text.split(" ").some(w=>
+     w===safe||
+     (safe.length>=4&&
+       (w===safe+"s"||
+        w===safe+"ed"||
+        w===safe+"ing"||
+        w===safe.slice(0,-1)+"ing"))
+   );
+ });
+}
+
+function checkReadingAnswer(){
+ const answer=$("readingAnswer").value.trim();
+
+ if(!answer){
+   $("readingFeedback").textContent=
+     "Try writing or speaking a short answer first.";
+   return;
+ }
+
+ const question=story[pageIndex].questions[currentLevel];
+ const correct=hasKeyword(answer,question[1]);
+
+ readingResponses[pageIndex]=answer;
+
+ if(!questionAttempts[pageIndex]){
+   questionAttempts[pageIndex]={attempts:0,matched:false};
+ }
+ questionAttempts[pageIndex].attempts++;
+ if(correct)questionAttempts[pageIndex].matched=true;
+
+ if(correct){
+   $("readingFeedback").textContent=
+     "✓ Good thinking! "+question[3];
+ }else{
+   $("readingFeedback").textContent=
+     "Thank you for your idea! Here is one possible answer: "+
+     question[3]+
+     " You can try again or continue reading.";
+ }
+}
+
+function saveReadingDraft(){
+ const draft=$("readingAnswer").value.trim();
+ if(draft)readingResponses[pageIndex]=draft;
+}
+
+function nextPage(){
+ saveReadingDraft();
+
+ if(pageIndex<story.length-1){
+   pageIndex++;
+   renderPage();
+   window.scrollTo({top:0,behavior:"instant"});
+ }else{
+   showRetelling();
+ }
+}
+
+function previousPage(){
+ saveReadingDraft();
+
+ if(pageIndex>0){
+   pageIndex--;
+   renderPage();
+ }
+}
+
+/* ==========================================
+   RETELLING
+========================================== */
+
+function makeWordCards(containerId){
+ const container=$(containerId);
+ container.innerHTML="";
+
+ vocabulary.forEach(item=>{
+   const button=document.createElement("button");
+   button.className="word-card";
+   button.textContent=item.word;
+   button.setAttribute("aria-label","Reveal meaning of "+item.word);
+
+   let revealed=false;
+
+   button.onclick=()=>{
+     revealed=!revealed;
+     button.innerHTML=escapeHTML(item.word)+
+       (revealed
+        ?`<span class="ko">${escapeHTML(item.ko)}</span>`
+        :"");
+   };
+
+   container.appendChild(button);
+ });
+}
+
+function showRetelling(){
+ stopSpeech();
+ makeWordCards("retellingWords");
+ updateProgress(75);
+ showSection("retelling");
+}
+
+function showRetellingHelp(){
+ $("retellingHelp").classList.toggle("hidden");
+}
+
+const verbForms={
+ hoist:/\bhoist(?:s|ed|ing)?\b/i,
+ sift:/\bsift(?:s|ed|ing)?\b/i,
+ whittle:/\bwhittl(?:e|es|ed|ing)\b/i,
+ braid:/\bbraid(?:s|ed|ing)?\b/i,
+ stoop:/\bstoop(?:s|ed|ing)?\b/i,
+ trample:/\btrampl(?:e|es|ed|ing)\b/i,
+ clasp:/\bclasp(?:s|ed|ing)?\b/i,
+ prod:/\bprod(?:s|ded|ding)?\b/i,
+ tug:/\btug(?:s|ged|ging)?\b/i,
+ clench:/\bclench(?:es|ed|ing)?\b/i,
+ snip:/\bsnip(?:s|ped|ping)?\b/i,
+ crumple:/\bcrumpl(?:e|es|ed|ing)\b/i,
+ shred:/\bshred(?:s|ded|ding)?\b/i,
+ dab:/\bdab(?:s|bed|bing)?\b/i,
+ slouch:/\bslouch(?:es|ed|ing)?\b/i
+};
+
+function detectVerbs(text){
+ return Object.entries(verbForms)
+   .filter(([verb,regex])=>regex.test(text))
+   .map(([verb])=>verb);
+}
+
+function checkRetelling(){
+ const answer=$("retellingAnswer").value.trim();
+
+ if(!answer){
+   $("retellingFeedback").textContent=
+     "Try retelling the story in your own words.";
+   return;
+ }
+
+ const detected=detectVerbs(answer);
+ retellingCount=detected.length;
+
+ if(detected.length>=3){
+   $("retellingFeedback").textContent=
+     `✓ Great! You used ${detected.length} target verbs: `+
+     detected.join(", ")+
+     ". Your retelling includes several actions from the story.";
+ }else{
+   $("retellingFeedback").textContent=
+     `You used ${detected.length} target verb(s). `+
+     (detected.length
+       ?"Found: "+detected.join(", ")+". "
+       :"")+
+     `Try adding ${3-detected.length} more. `+
+     "For example, describe the banner, ribbons, or paper.";
+ }
+}
+
+function returnToBook(){
+ renderPage();
+ showSection("reader");
+}
+
+/* ==========================================
+   VOCABULARY QUIZ
+========================================== */
+
+const quizBank=[
+ {q:"Which verb means to lift something upward?",
+  a:"hoist",options:["hoist","dab","shred","stoop"]},
+ {q:"Which verb means to pass flour through a sieve?",
+  a:"sift",options:["sift","clasp","trample","tug"]},
+ {q:"Which verb means to carve small pieces from wood?",
+  a:"whittle",options:["whittle","snip","clench","dab"]},
+ {q:"Which verb means to weave strands together?",
+  a:"braid",options:["braid","hoist","prod","stoop"]},
+ {q:"Which verb means to bend your body downward?",
+  a:"stoop",options:["stoop","tug","shred","clasp"]},
+ {q:"Which verb means to step heavily on something?",
+  a:"trample",options:["trample","sift","snip","dab"]},
+ {q:"Which verb means to hold something firmly?",
+  a:"clasp",options:["clasp","prod","slouch","whittle"]},
+ {q:"Which verb means to poke something?",
+  a:"prod",options:["prod","braid","hoist","crumple"]},
+ {q:"Which verb means to pull something hard?",
+  a:"tug",options:["tug","sift","snip","dab"]},
+ {q:"Which verb means to close your fist tightly?",
+  a:"clench",options:["clench","shred","braid","stoop"]},
+ {q:"Which verb means to make small cuts?",
+  a:"snip",options:["snip","clasp","hoist","prod"]},
+ {q:"Which verb means to crush paper into wrinkles?",
+  a:"crumple",options:["crumple","sift","tug","dab"]},
+ {q:"Which verb means to tear into small strips?",
+  a:"shred",options:["shred","whittle","clench","stoop"]},
+ {q:"Which verb means to touch lightly and repeatedly?",
+  a:"dab",options:["dab","trample","hoist","snip"]},
+ {q:"Which verb means to sit or stand with a bent posture?",
+  a:"slouch",options:["slouch","braid","clasp","prod"]}
+];
+
+function shuffle(array){
+ const a=[...array];
+ for(let i=a.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+
+function startQuiz(){
+ const answer=$("retellingAnswer").value.trim();
+ if(answer)retellingCount=detectVerbs(answer).length;
+
+ quizItems=shuffle(quizBank).slice(0,3);
+ quizIndex=0;
+ quizScore=0;
+ renderQuiz();
+ showSection("quiz");
+}
+
+function renderQuiz(){
+ quizAnswered=false;
+ const item=quizItems[quizIndex];
+
+ $("quizNumber").textContent=
+   `Vocabulary Check ${quizIndex+1} / 3`;
+ $("quizQuestion").textContent=item.q;
+ $("quizFeedback").textContent="";
+ $("quizNext").classList.add("hidden");
+ $("quizOptions").innerHTML="";
+
+ shuffle(item.options).forEach(option=>{
+   const button=document.createElement("button");
+   button.className="quiz-option";
+   button.textContent=option;
+   button.onclick=()=>answerQuiz(option);
+   $("quizOptions").appendChild(button);
+ });
+
+ updateProgress(85+(quizIndex/3)*15);
+}
+
+function answerQuiz(option){
+ if(quizAnswered)return;
+
+ quizAnswered=true;
+ const item=quizItems[quizIndex];
+
+ if(option===item.a){
+   quizScore++;
+   $("quizFeedback").textContent=
+     "✓ Correct! "+item.a+" is the right answer.";
+ }else{
+   $("quizFeedback").textContent=
+     "The correct answer is "+item.a+".";
+ }
+
+ document.querySelectorAll(".quiz-option").forEach(button=>{
+   button.disabled=true;
+   if(button.textContent===item.a){
+     button.classList.add("correct");
+   }else if(button.textContent===option){
+     button.classList.add("incorrect");
+   }
+ });
+
+ $("quizNext").textContent=
+   quizIndex===2?"See My Results →":"Next Question →";
+ $("quizNext").classList.remove("hidden");
+}
+
+function nextQuiz(){
+ quizIndex++;
+ if(quizIndex<quizItems.length){
+   renderQuiz();
+ }else{
+   finishActivity();
+ }
+}
+
+/* ==========================================
+   RESULTS
+========================================== */
+
+function finishActivity(){
+ stopSpeech();
+
+ if(timerId){
+   clearInterval(timerId);
+   timerId=null;
+ }
+
+ const responseCount=
+   Object.values(readingResponses)
+     .filter(answer=>answer.trim().length>0).length;
+
+ $("readingStat").textContent=responseCount;
+ $("retellingStat").textContent=retellingCount;
+ $("quizStat").textContent=quizScore+"/3";
+
+ makeWordCards("finalWordGrid");
+ updateProgress(100);
+ showSection("results");
+}
+
+function restart(){
+ stopSpeech();
+
+ if(recognition){
+   try{recognition.abort();}catch(e){}
+   recognition=null;
+ }
+
+ if(timerId){
+   clearInterval(timerId);
+   timerId=null;
+ }
+
+ timeLeft=300;
+ updateTimer();
+ updateProgress(0);
+ readingResponses={};
+ questionAttempts={};
+ retellingCount=0;
+ quizScore=0;
+
+ $("retellingAnswer").value="";
+ $("retellingFeedback").textContent="";
+ $("retellingHelp").classList.add("hidden");
+
+ showSection("welcome");
+}
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+$("coverArt").innerHTML=svgIllustration("festival");
+renderLevelButtons();
+selectLevel("A2");
+updateProgress(0);
+
+window.addEventListener("beforeunload",()=>{
+ stopSpeech();
+ if(recognition){
+   try{recognition.abort();}catch(e){}
+ }
+});
+
+</script>
+</body>
+</html>
